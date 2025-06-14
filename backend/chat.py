@@ -12,39 +12,53 @@ import os
 load_dotenv()
 
 # Initialize OpenAI client
-openai_api_key = os.getenv("OPENAI_API_KEY")
-llm_client = OpenAI(api_key=openai_api_key)
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    print("❌ Error: OPENAI_API_KEY is not set in the environment.")
+    raise EnvironmentError("Missing OPENAI_API_KEY in environment.")
 
-# Load embedding model
-embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+openai_client = OpenAI(api_key= api_key)
 
-# Connect to Qdrant vector database
-vector_db = QdrantVectorStore.from_existing_collection(
-    embedding=embedding_model,
-    collection_name="chai_docs",
-    url="http://localhost:6333"
+# Use OpenAI Embeddings
+embedding_model = OpenAIEmbeddings(
+    model="text-embedding-3-small"  # or "text-embedding-3-large"
 )
 
-# Function to process user question
-def generate_response_from_documents(user_question: str):
-    search_results = vector_db.similarity_search(query=user_question, k=5)
+# Connect to Qdrant
+vector_store = QdrantVectorStore.from_existing_collection(
+    embedding=embedding_model,
+    collection_name="chai_docs",
+    url="http://localhost:6333",
+)
 
+
+# Process user query
+def process_query(query: str):
+    search_results = vector_store.similarity_search(query=query, k=5)
+
+    relevant_results = [result for result in search_results if result.page_content.strip()]
+
+    if not relevant_results:
+        return json.dumps({
+            "Answer": "I couldn’t find the answer from chaidocs.",
+            "Code": "",
+            "Section": "",
+            "Sub_section": "",
+            "url": ""
+        })
+        
+        
     context = "\n\n\n".join([
-        f"Page Content: {doc.page_content}\n"
-        f"Section: {doc.metadata.get('section', 'N/A')}\n"
-        f"Sub-section: {doc.metadata.get('sub_section', 'N/A')}\n"
-        f"url: {doc.metadata.get('url', 'N/A')}"
-        for doc in search_results
+        f"Page Content: {result.page_content}\nSection: {result.metadata['section']}\nSub-section: {result.metadata['sub_section']}\nurl: {result.metadata['url']}"
+        for result in search_results
     ])
 
-    system_prompt = """
+    SYSTEM_PROMPT = """
         You are a helpful assistant that gives detailed, accurate answers based on the provided document context.
-
+        
         If you find relevant information in the context, answer the question clearly and concisely.
         If not, say: "I couldn’t find the answer from chaidocs."
-
-        Always mention the section, subsection and url (to navigate) where relevant information was found.
-
+        
         Output Format in JSON:
         {
             "Answer": "<Give your detailed answer>",
@@ -55,28 +69,40 @@ def generate_response_from_documents(user_question: str):
         }
     """
 
-    user_prompt = f"""
+
+    USER_PROMPT = f"""
         Use the following context to answer the question.
         Context: {context}
-        Question: {user_question}
+        Question: {query}
     """
 
-    response = llm_client.chat.completions.create(
+    response = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": USER_PROMPT}
         ],
-        response_format={"type": "json_object"}
+        response_format={"type": "json_object"}, 
     )
 
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+    if "I couldn’t find the answer from chaidocs." in content:
+        return json.dumps({
+            "Answer": "I couldn’t find the answer from chaidocs.",
+            "Code": "",
+            "Section": "",
+            "Sub_section": "",
+            "url": ""
+        })
+
+    return content
+    
 
 
-# Initialize FastAPI app
+# FastAPI App
 app = FastAPI()
 
-# Enable CORS for all origins
+# Allow all origins (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -85,22 +111,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Request schema
-class QuestionRequest(BaseModel):
+# Input model
+class Query(BaseModel):
     question: str
 
 
-# API endpoint to handle query
+# POST /query endpoint
 @app.post("/query")
-async def handle_question(request: QuestionRequest):
-    try:
-        response_content = generate_response_from_documents(request.question)
-        return json.loads(response_content)
-    except Exception as e:
-        return {"error": str(e)}
+async def ask(query: Query):
+    response = process_query(query.question)
+    return json.loads(response)
 
 
-# Start the app (for direct run)
+# Run the server
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("chat:app", host="127.0.0.1", port=8000, reload=True)

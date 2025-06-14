@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ChaiDocs Assistant",
+  "name": "Your Own Assistant",
   "version": "1.0",
   "description": "Ask questions about ChaiDocs with section-wise navigation.",
   "permissions": [

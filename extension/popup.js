@@ -4,7 +4,11 @@ function formatMarkdown(text) {
       return `
         <div class="code-block">
           <button class="copy-btn">📋</button>
-          <pre class="rounded"><code class="language-${lang}">${Prism.highlight(code, Prism.languages[lang] || Prism.languages.javascript, lang)}</code></pre>
+          <pre class="rounded"><code class="language-${lang}">${Prism.highlight(
+        code,
+        Prism.languages[lang] || Prism.languages.javascript,
+        lang
+      )}</code></pre>
         </div>`;
     })
     .replace(/\n/g, "<br>");
@@ -28,7 +32,7 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
     const res = await fetch("http://localhost:8000/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: query })
+      body: JSON.stringify({ question: query }),
     });
 
     let data = await res.json();
@@ -44,34 +48,37 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
     avatar.src = "assets/assistant.png";
 
     const answer = formatMarkdown(data.Answer || "Error: No response.");
-    const section = data.Section || "-";
-    const sub = data.Sub_section || "-";
-    const link = data.url || "#";
+    const section = data.Section ;
+    const sub = data.Sub_section;
+    const link = data.url;
     const code = data.Code
       ? `<pre class="bg-dark text-light p-2 rounded mt-2"><code>${data.Code}</code></pre>`
       : "";
 
+    let meta = "";
+    if (section && sub && link) {
+      meta = `
+    <span class="meta">
+      <strong>Section:</strong> ${section} |
+      <strong>Sub:</strong> ${sub} |
+      <a href="${link}" target="_blank">🔗 Link</a>
+    </span>
+  `;
+    }
     chat.innerHTML += `
-      <div class="message bot">
-        <div>${answer}</div>
-        ${code}
-        <span class="meta">
-          <strong>Section:</strong> ${section} |
-          <strong>Sub:</strong> ${sub} |
-          <a href="${link}" target="_blank">🔗 Link</a>
-        </span>
-      </div>
-    `;
+  <div class="message bot">
+    <div>${answer}</div>
+    ${code}
+    ${meta}
+  </div>
+`;
 
     chat.scrollTop = chat.scrollHeight;
-
   } catch (err) {
     chat.innerHTML += `<div class="message bot">❌ Server error. Try again later.</div>`;
     console.error(err);
   }
 });
-
-
 
 document.querySelectorAll(".copy-btn").forEach((btn) => {
   btn.onclick = () => {
