@@ -1,0 +1,13 @@
+#chaidocs-float-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+#chaidocs-float-btn:hover {
+  transform: scale(1.1);
+}

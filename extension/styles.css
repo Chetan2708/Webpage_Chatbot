@@ -1,0 +1,89 @@
+body {
+  animation: gradientBG 12s ease infinite;
+  background: linear-gradient(-45deg, #4158d0, #c850c0, #ffcc70, #4ca1af);
+  background-size: 400% 400%;
+  color: white;
+  font-family: "Segoe UI", sans-serif;
+  min-width: 360px;
+  min-height: 100vh;
+  width: 380px;
+  max-width: 100%;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+#botAvatar {
+  transition: opacity 0.3s ease;
+}
+
+#chatContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #000;
+  border-radius: 12px;
+  padding: 10px;
+  height: 300px;
+  overflow-y: auto;
+}
+
+.message {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  max-width: 80%;
+  border-radius: 16px;
+  word-wrap: break-word;
+}
+
+.user {
+  background-color: #e9ecef;
+  align-self: flex-end;
+  border-bottom-right-radius: 0;
+  text-align: right;
+}
+
+.bot {
+  background-color: #e7f3ff;
+  align-self: flex-start;
+  border-bottom-left-radius: 0;
+  text-align: left;
+}
+
+.meta {
+  display: block;
+  font-size: 0.75rem;
+  color: #333;
+  margin-top: 4px;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+.code-block {
+  position: relative;
+  margin-top: 12px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: #eee;
+  border: none;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 4px;
+  z-index: 10;
+}

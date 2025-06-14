@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "ChaiDocs Assistant",
+  "version": "1.0",
+  "description": "Ask questions about ChaiDocs with section-wise navigation.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "http://localhost:8000/"
+  ],
+  "host_permissions": ["https://docs.chaicode.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://docs.chaicode.com/*"],
+      "js": ["content.js","injectIcon.js"],
+      "css": ["injectIcon.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup.html",
+        "popup.js",
+        "lottie-player.mjs",
+        "injectIcon.css",
+        "assets/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
