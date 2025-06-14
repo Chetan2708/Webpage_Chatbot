@@ -29,6 +29,7 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
   input.value = "";
 
   try {
+    
     const res = await fetch("http://localhost:8000/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -79,6 +80,8 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
     console.error(err);
   }
 });
+
+
 
 document.querySelectorAll(".copy-btn").forEach((btn) => {
   btn.onclick = () => {

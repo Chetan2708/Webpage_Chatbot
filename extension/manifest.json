@@ -12,8 +12,8 @@
   "content_scripts": [
     {
       "matches": ["https://docs.chaicode.com/*"],
-      "js": ["content.js","injectIcon.js"],
-      "css": ["injectIcon.css"]
+      "js": ["content.js","inject.js"],
+      "css": ["inject.css"]
     }
   ],
   "web_accessible_resources": [

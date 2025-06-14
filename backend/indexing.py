@@ -73,5 +73,5 @@ def index_documents_from_urls():
         except Exception as e:
             print(f"❌ Failed to process [{index}] {url}: {str(e)}")
 
-if __name__ == "__main__":
-    index_documents_from_urls()
+# if __name__ == "__main__":
+    # index_documents_from_urls()  // do it only once for the first time
