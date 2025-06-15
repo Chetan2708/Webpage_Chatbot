@@ -17,13 +17,12 @@ if not api_key:
     raise EnvironmentError("Missing OPENAI_API_KEY in environment.")
 openai_client = OpenAI(api_key=api_key)
 
-# Set up OpenAI embedding model
-embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 
 # Configure document splitter
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=200
+    chunk_size=1000,
+    chunk_overlap=500
 )
 
 # Qdrant configuration
@@ -73,5 +72,5 @@ def index_documents_from_urls():
         except Exception as e:
             print(f"❌ Failed to process [{index}] {url}: {str(e)}")
 
-# if __name__ == "__main__":
-    # index_documents_from_urls()  // do it only once for the first time
+if __name__ == "__main__":
+    index_documents_from_urls()  

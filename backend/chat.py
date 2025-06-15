@@ -20,9 +20,7 @@ if not api_key:
 openai_client = OpenAI(api_key= api_key)
 
 # Use OpenAI Embeddings
-embedding_model = OpenAIEmbeddings(
-    model="text-embedding-3-small"  # or "text-embedding-3-large"
-)
+embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 
 # Connect to Qdrant
 vector_store = QdrantVectorStore.from_existing_collection(
@@ -34,20 +32,8 @@ vector_store = QdrantVectorStore.from_existing_collection(
 
 # Process user query
 def process_query(query: str):
+    
     search_results = vector_store.similarity_search(query=query, k=5)
-
-    relevant_results = [result for result in search_results if result.page_content.strip()]
-
-    if not relevant_results:
-        return json.dumps({
-            "Answer": "I couldn’t find the answer from chaidocs.",
-            "Code": "",
-            "Section": "",
-            "Sub_section": "",
-            "url": ""
-        })
-        
-        
     context = "\n\n\n".join([
         f"Page Content: {result.page_content}\nSection: {result.metadata['section']}\nSub-section: {result.metadata['sub_section']}\nurl: {result.metadata['url']}"
         for result in search_results

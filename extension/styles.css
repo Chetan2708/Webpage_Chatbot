@@ -57,6 +57,18 @@ body {
   border-bottom-left-radius: 0;
   text-align: left;
 }
+.bot-message{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+}
+.bot-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
 
 .meta {
   display: block;

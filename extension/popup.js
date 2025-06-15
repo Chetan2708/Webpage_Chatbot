@@ -68,7 +68,10 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
     }
     chat.innerHTML += `
   <div class="message bot">
-    <div>${answer}</div>
+    <div class="bot-message">
+    <img src="assets/assistant.png" class="bot-avatar" alt="Bot" />
+    ${answer}
+    </div>
     ${code}
     ${meta}
   </div>
